@@ -1,2 +1,1 @@
-# pdf-parser-benchmark
-# pdf-parser-benchmark
+# PDF Parser Benchmark
