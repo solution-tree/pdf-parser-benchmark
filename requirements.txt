@@ -1,0 +1,34 @@
+# Core RAG
+llama-index-core>=0.12.0
+llama-index-vector-stores-qdrant>=0.4.0
+llama-index-embeddings-openai>=0.3.0
+llama-index-llms-openai>=0.3.0
+llama-index-readers-file>=0.4.0   # PyMuPDFReader, PDFReader
+
+# Vector DB
+qdrant-client>=1.9.0
+
+# PDF
+pymupdf>=1.24.0
+
+# Cache
+redis>=5.0.0
+
+# Database
+asyncpg>=0.29.0
+sqlalchemy[asyncio]>=2.0.0
+
+# API
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# CLI
+rich>=13.0.0
+prompt_toolkit>=3.0.0
+
+# Utils
+python-dotenv>=1.0.0
+httpx>=0.27.0
+tenacity>=8.0.0
