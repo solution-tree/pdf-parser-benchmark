@@ -11,6 +11,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from typing import Optional
+
 from src.cache import get_cached, make_cache_key, set_cached
 from src.config import get_config
 from src.rag import QueryResult, load_query_engine, query
@@ -19,7 +21,7 @@ from src.web_search import perplexity_search
 console = Console()
 
 # Store last query result for `sources` command
-_last_result: QueryResult | None = None
+_last_result: Optional[QueryResult] = None
 
 
 def connect_redis(config):

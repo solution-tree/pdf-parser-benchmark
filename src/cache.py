@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from typing import Optional
 
 import redis.asyncio as redis
 
@@ -12,7 +13,7 @@ def make_cache_key(query: str, model: str, top_k: int) -> str:
     return f"plc_kb:{hashlib.sha256(payload.encode()).hexdigest()}"
 
 
-async def get_cached(r: redis.Redis, key: str) -> dict | None:
+async def get_cached(r: redis.Redis, key: str) -> Optional[dict]:
     """Retrieve a cached result by key."""
     val = await r.get(key)
     return json.loads(val) if val else None
