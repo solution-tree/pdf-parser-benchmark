@@ -43,6 +43,9 @@ class Config(BaseSettings):
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
 
+    # LLMSherpa (nlm-ingestor service for layout-aware PDF parsing)
+    LLMSHERPA_API_URL: str = "http://localhost:5010/api/parseDocument?renderFormat=all"
+
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/plc_kb"
 
