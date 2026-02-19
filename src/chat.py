@@ -15,7 +15,7 @@ from typing import Optional
 
 from src.cache import get_cached, make_cache_key, set_cached
 from src.config import get_config
-from src.rag import QueryResult, load_query_engine, query
+from src.rag import QueryResult, load_index, query
 from src.web_search import perplexity_search
 
 console = Console()
@@ -149,10 +149,10 @@ def main():
         console.print("[red][ERROR] OPENAI_API_KEY is not set. Add it to your .env file.[/red]")
         sys.exit(1)
 
-    # Load query engine
-    with console.status("[bold green]Loading RAG engine..."):
-        engine = load_query_engine(config)
-    console.print("[green]RAG engine loaded.[/green]")
+    # Load index
+    with console.status("[bold green]Loading RAG index..."):
+        engine = load_index(config)
+    console.print("[green]RAG index loaded.[/green]")
 
     # Connect Redis (optional)
     redis_client = connect_redis(config)

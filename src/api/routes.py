@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from src.config import get_config
 from src.embed import build_index, get_qdrant_client
-from src.rag import QueryResult, load_query_engine, query
+from src.rag import QueryResult, load_index, query
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ def _get_engine():
     global _engine
     if _engine is None:
         config = get_config()
-        _engine = load_query_engine(config)
+        _engine = load_index(config)
     return _engine
 
 
