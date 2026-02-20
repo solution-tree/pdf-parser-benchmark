@@ -41,7 +41,7 @@ Ingestion reads book metadata from `data/manifest.json`, then processes each PDF
 | `chapter` | Running chapter heading | `Chapter 3: Collaboration` |
 | `section` | Running section heading | `The Four Questions` |
 | `page_number` | 1-based page number | `42` |
-| `chunk_type` | `body_text`, `title`, `list`, `table`, `reproducible` | `reproducible` |
+| `chunk_type` | `body_text`, `title`, `list`, `table`, `reproducible`, `chapter_summary`, `callout` | `reproducible` |
 | `reproducible_id` | ID extracted from GPT-4o description | `4.3` |
 
 ---
@@ -49,7 +49,8 @@ Ingestion reads book metadata from `data/manifest.json`, then processes each PDF
 ## Requirements
 
 - Python 3.11+
-- Docker + Docker Compose (for Qdrant, Redis, Postgres, **LLMSherpa**)
+- Docker + Docker Compose (for Qdrant, Redis, Postgres)
+- [nlm-ingestor](https://github.com/nlmatics/nlm-ingestor) (LLMSherpa service) — run separately
 - OpenAI API key
 - Perplexity API key (optional, for web search fallback)
 
@@ -74,10 +75,26 @@ cp .env.example .env
 
 ```bash
 docker-compose up -d
-# Starts Qdrant (6333), Redis (6379), Postgres (5432), LLMSherpa/nlm-ingestor (5010)
+# Starts Qdrant (6333), Redis (6379), Postgres (5432)
 ```
 
-The LLMSherpa service (`nlm-ingestor`) must be running before ingestion. It is included in `docker-compose.yml` and exposed at `http://localhost:5010`.
+**4. Start the LLMSherpa / nlm-ingestor service**
+
+The LLMSherpa service is **not** included in `docker-compose.yml` — run it separately:
+
+```bash
+docker run -p 5010:5010 ghcr.io/nlmatics/nlm-ingestor:latest
+```
+
+Verify it's up:
+```bash
+curl http://localhost:5010/api/parseDocument
+```
+
+Set the URL in `.env` if you run it on a different host/port:
+```env
+LLMSHERPA_API_URL=http://localhost:5010/api/parseDocument?renderFormat=all
+```
 
 ---
 
@@ -273,7 +290,7 @@ docker-compose up -d qdrant
 
 **LLMSherpa service not running** — ingest will fail at the layout parsing step:
 ```bash
-docker-compose up -d nlm-ingestor
+docker run -p 5010:5010 ghcr.io/nlmatics/nlm-ingestor:latest
 # Verify: curl http://localhost:5010/api/parseDocument
 ```
 
