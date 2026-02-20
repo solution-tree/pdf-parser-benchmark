@@ -1,4 +1,7 @@
-# PDF Parser Llama — PLC Knowledge Base
+# PDF Parser Llama — PLC Knowledge Base (PyMuPDF branch)
+
+> **Branch:** `test-pymupdf` — PDF parsing via PyMuPDF + LlamaIndex `SimpleDirectoryReader`.
+> Compare with `main` (LLMSherpa layout-aware parsing) to evaluate extraction quality.
 
 A RAG (Retrieval-Augmented Generation) system over 25 Professional Learning Communities (PLC) education books. Powered by LlamaIndex + OpenAI GPT-4 + Qdrant. Optional Perplexity web search fallback.
 
@@ -12,13 +15,29 @@ A RAG (Retrieval-Augmented Generation) system over 25 Professional Learning Comm
 | LLM | OpenAI GPT-4 (`gpt-4o`) |
 | Embeddings | OpenAI `text-embedding-3-large` |
 | Vector Store | Qdrant (self-hosted) |
-| PDF Parser | PyMuPDF (fitz) |
+| PDF Parser | PyMuPDF via LlamaIndex `PyMuPDFReader` |
 | Cache | Redis |
-| Database | PostgreSQL (RDS) |
+| Database | PostgreSQL |
 | Web Search | Perplexity API (optional) |
 | API Server | FastAPI (Alpha+) |
 | CLI | Rich + prompt_toolkit |
 | Infra | AWS EC2 → ECS/Fargate |
+
+---
+
+## How Ingestion Works
+
+`SimpleDirectoryReader` + `PyMuPDFReader` produces **one Document per page**. A `SentenceSplitter` then chunks each page into overlapping text nodes via an `IngestionPipeline`. Repeated headers/footers appearing on > 40% of pages are stripped before chunking.
+
+**Metadata on every node (auto-populated):**
+
+| Field | Source | Example |
+|-------|--------|---------|
+| `sku` | Filename stem (first 6 chars) | `bkf032` |
+| `book_title` | Filename slug → title-cased | `Professional Learning Communities At Work` |
+| `source` | Filename stem | `bkf032_professional-learning...` |
+| `page_label` | Set by `PyMuPDFReader` (1-based) | `12` |
+| `file_name`, `file_path`, `file_size` | Set by `SimpleDirectoryReader` | — |
 
 ---
 
@@ -59,7 +78,7 @@ docker-compose up -d
 
 ### Step 1 — Ingest PDFs
 
-Parses all PDFs in `data/pdfs/` → structured JSON in `data/processed/`.
+Reads all PDFs in `data/pdfs/` → one Document per page via PyMuPDF → boilerplate stripped → chunked → saved to `data/processed/nodes.json`.
 
 ```bash
 python -m src.ingest
@@ -179,7 +198,7 @@ pdf-parser-llama/
 ├── docker-compose.yml
 ├── src/
 │   ├── config.py          # pydantic-settings config
-│   ├── ingest.py          # PDF parsing + chunking
+│   ├── ingest.py          # PyMuPDF parsing + SentenceSplitter chunking
 │   ├── embed.py           # Qdrant embedding
 │   ├── rag.py             # LlamaIndex query engine
 │   ├── web_search.py      # Perplexity fallback
